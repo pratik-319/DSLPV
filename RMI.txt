@@ -1,0 +1,64 @@
+import java.rmi.*;
+
+public interface ServerInterface extends Remote{
+    double add(double num1 ,double num2) throws RemoteException;
+} 
+
+
+
+import java.rmi.*;
+import java.rmi.server.*;
+
+public class ServerImpl extends UnicastRemoteObject implements ServerInterface{
+    public ServerImpl() throws RemoteException{}
+    public double add(double num1,double num2){
+        double result =num1+num2;
+        System.out.println("At server :add("+num1+num2+") = "+result);
+        return result;
+    }
+}
+
+
+import java.rmi.*;
+
+
+public class Server {
+    public static void main(String[] args) {
+        try{
+            ServerImpl serverImpl=new ServerImpl();
+            Naming.rebind("Server", serverImpl);
+            System.out.println("Server Started ...");
+        }catch(Exception e){
+            System.out.println("Exception "+e);
+        }
+    }
+}
+
+
+import java.rmi.*;
+
+public class Client {
+	public static void main(String args[]){
+		try {
+			String rmiURL = "rmi://localhost/Server";
+			ServerInterface serverInterface = (ServerInterface) Naming.lookup(rmiURL);
+			double num1 = Double.parseDouble(args[0]);
+			double num2 = Double.parseDouble(args[1]);
+			System.out.println("At Client: add(" + num1 + "," + num2 + ") = " + serverInterface.add(num1, num2));
+		} catch (Exception e) {
+			System.out.println("Exception: " + e);
+		}
+	}
+}
+
+
+command - 
+
+javac *.java;       
+rmic ServerImpl
+rmiregistry
+
+java Server
+
+java Client 10 20
+
